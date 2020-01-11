@@ -1,0 +1,71 @@
+#Combining Data Into One Database
+
+import pandas as pd
+import numpy as np
+
+data_1 = pd.read_csv("advisedBy.csv")
+data_2 = pd.read_csv("course.csv")
+data_3 = pd.read_csv("person.csv")
+data_4 = pd.read_csv("taughtBy.csv")
+
+#DataFrame Combining Function
+def datacomb(data1,data2):
+
+    #data1 properties
+    data1_rows = len(data1)
+    data1_column = int(data1.size/data1_rows)
+    data1_label = data1.columns
+
+    #data2 properties
+    data2_rows = len(data2)
+    data2_column = int(data2.size/data2_rows)
+    data2_label = data2.columns
+
+    #Column Benchmark
+    for i in range(data1_column):
+        for j in range(data2_column):
+            if data1_label[i] == data2_label[j]:
+                break
+            
+        if data1_label[i] == data2_label[j]:
+            break
+
+    benchmark_index = j
+    benchmark = data2_label[j]
+
+    #Joined Dataframe Template
+    new_column = (data2_column-1)*[None]
+    a = -1
+    
+    for i in range(data2_column):
+        if i == benchmark_index:
+            continue
+
+        else:
+            data1[data2_label[i]] = data1_rows*[None]
+            new_column[a+1] = data2_label[i]
+            
+    #Filling Joinend Dataframe
+    for h in range(data2_rows):
+        for i in range(data1_rows):
+            if data2.loc[h,benchmark] == data1.loc[i,benchmark]:
+                break
+
+        if data2_column-1 == 1:   
+            data1.loc[i,new_column[0]] = data2.loc[h, new_column[0]]
+
+        else:
+            for j in range(data2_rows-1):
+                data1.loc[i,new_column[j]] = data2.loc[h, new_column[j]]
+
+    return data1
+
+#Combining Dataframe with data_3 as Base
+data_3 = datacomb(data_3, data_1)
+data_3 = datacomb(data_3, data_4)
+data_3 = datacomb(data_3, data_2)
+
+#Save Combined Dataframe into CSV
+data_3.to_csv("data-warehouse.csv")
+
+        
